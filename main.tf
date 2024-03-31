@@ -104,6 +104,12 @@ output "aws_ami_id" {
   
 }
 
+output "ec2_public_ip" {
+  value = aws_instance.aws-server.public_ip
+  
+}
+
+
 resource "aws_key_pair" "ssh-key" {
   key_name = "server-key"
   public_key = file(var.my_pub_location)
@@ -120,6 +126,14 @@ resource "aws_instance" "aws-server" {
 
   associate_public_ip_address = true
   key_name = aws_key_pair.ssh-key.key_name
+
+  user_data = <<EOF
+                  #!/bin/bash
+                  sudo yum update -y &&sudo yum install -y docker
+                  sudo systemctl start docker
+                  sudo usermod -aG docker ec2-user
+                  docker run -p 8080:80 nginx
+              EOF     
 
   tags = {
     name: "${var.env_prefix}-server"
