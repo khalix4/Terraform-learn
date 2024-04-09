@@ -12,3 +12,6 @@ variable "my_pub_location" {
 variable "private_key_location" {
   
 }
+variable "image_name" {
+  
+}
